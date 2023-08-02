@@ -303,3 +303,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Jupyter Notebook
+*.ipynb 
+
+# tmp folder
+tmp/
