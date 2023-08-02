@@ -304,8 +304,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Jupyter Notebook
-*.ipynb 
+# Testing
+*.ipynb
+test_*.py
 
 # tmp folder
 tmp/
