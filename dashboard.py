@@ -20,13 +20,13 @@ def get_composers(dataset):
     return composers
 
 
-def show_midi_pieces(filtered_dataset, pieces_per_page, current_page):
+def show_midi_pieces(filtered_dataset, pieces_per_page, current_page, subheader=""):
     # Calculate the start and end index for the current page
     start_idx = (current_page - 1) * pieces_per_page
     end_idx = min(start_idx + pieces_per_page, len(filtered_dataset))
 
     # Display the records for the selected composer for the current page
-    st.subheader(f"Composer: {filtered_dataset[start_idx]['composer']}")
+    st.subheader(subheader)
     cols = st.columns(2)
 
     for it in range(start_idx, end_idx):
@@ -41,15 +41,27 @@ def show_midi_pieces(filtered_dataset, pieces_per_page, current_page):
             st.table(piece.source)
 
 
+def update_page(dataset, option, value, title=""):
+    if option == "composer":
+        filtered_dataset = dataset.filter(lambda example: example["composer"] == value)
+
+    elif option == "title":
+        # search for titles that contain the search string
+        filtered_dataset = dataset.filter(lambda example: value in example["title"])
+
+    return filtered_dataset
+
+
 def main():
     # Set the layout of the Streamlit page
     st.set_page_config(layout="wide")
 
     # select the number of pieces per page
-    pieces_per_page = st.selectbox("Select the number of pieces per page:", [4, 6, 8, 10])
 
-    # Create a combo box to select a split (train, test, or validation)
-    selected_split = st.selectbox("Select a split:", ["train", "test", "validation"])
+    with st.sidebar:
+        # Create a combo box to select a split (train, test, or validation)
+        pieces_per_page = st.selectbox("Select the number of pieces per page:", [4, 6, 8, 10])
+        selected_split = st.selectbox("Select a split:", ["train", "test", "validation"])
 
     # Load the dataset for the selected split
     dataset = load_data(selected_split)
@@ -62,10 +74,30 @@ def main():
         return
 
     # Create a combo box to select a composer
-    selected_composer = st.selectbox("Select a composer:", composers)
+    selected_composer = st.sidebar.selectbox("Select a composer:", composers)
 
-    # Filter the dataset based on the selected composer
-    filtered_dataset = dataset.filter(lambda example: example["composer"] == selected_composer)
+    # Create a text input to search by title
+    search_by_title = st.sidebar.text_input("Search by title:")
+
+    try:
+        search_by
+    except NameError:
+        search_by = "composer"
+
+    if search_by == "title":
+        filtered_dataset = dataset.filter(lambda example: str(search_by_title) in example["title"])
+    else:
+        filtered_dataset = dataset.filter(lambda example: example["composer"] == selected_composer)
+
+    # create two buttons to select the composer or the title
+    by_composer, _, by_title = st.sidebar.columns([1, 0.1, 1])
+
+    if by_title.button("Search by title"):
+        # search_by = "title"
+        filtered_dataset = dataset.filter(lambda example: str(search_by_title) in example["title"])
+
+    if by_composer.button("Search by composer"):
+        search_by = "composer"
 
     # Create a slider for page navigation
     pages = len(filtered_dataset) // pieces_per_page
