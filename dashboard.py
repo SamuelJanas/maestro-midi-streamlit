@@ -7,10 +7,22 @@ import utils as U
 # Define the number of records to display per page
 n_records_per_page = 4
 
+# Global variables to store filter options
+selected_composer = None
+search_by_title = None
+filter_option = None
+
 
 def load_data(selected_split):
     # Load the dataset for the selected split
     dataset = load_dataset("roszcz/maestro-v1-sustain", split=selected_split)
+
+    # Apply the filtering based on the current filter option
+    if filter_option == "composer" and selected_composer:
+        dataset = dataset.filter(lambda example: example["composer"] == selected_composer)
+    elif filter_option == "title" and search_by_title:
+        dataset = dataset.filter(lambda example: str(search_by_title) in example["title"])
+
     return dataset
 
 
@@ -79,25 +91,15 @@ def main():
     # Create a text input to search by title
     search_by_title = st.sidebar.text_input("Search by title:")
 
-    try:
-        search_by
-    except NameError:
-        search_by = "composer"
+    # Create a radio button to select the filter option (composer or title)
+    filter_option = st.sidebar.radio("Filter by:", ["composer", "title"])
 
-    if search_by == "title":
+    if filter_option == "composer" and selected_composer:
+        filtered_dataset = dataset.filter(lambda example: example["composer"] == selected_composer)
+    elif filter_option == "title" and search_by_title:
         filtered_dataset = dataset.filter(lambda example: str(search_by_title) in example["title"])
     else:
-        filtered_dataset = dataset.filter(lambda example: example["composer"] == selected_composer)
-
-    # create two buttons to select the composer or the title
-    by_composer, _, by_title = st.sidebar.columns([1, 0.1, 1])
-
-    if by_title.button("Search by title"):
-        # search_by = "title"
-        filtered_dataset = dataset.filter(lambda example: str(search_by_title) in example["title"])
-
-    if by_composer.button("Search by composer"):
-        search_by = "composer"
+        filtered_dataset = dataset
 
     # Create a slider for page navigation
     pages = len(filtered_dataset) // pieces_per_page
