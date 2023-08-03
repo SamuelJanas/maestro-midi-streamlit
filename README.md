@@ -11,5 +11,6 @@
     ```
 4. Go to http://0.0.0.0:4466
 
+---
+![image](https://github.com/SamuelJanas/maestro-midi-streamlit/assets/35274379/bafcacfc-1a6d-434d-822f-457eb211fb80)
 
-![image](https://github.com/Nospoko/maestro-midi-streamlit/assets/8056825/9b73db80-548c-4f45-bb39-6626cb824cc6)
