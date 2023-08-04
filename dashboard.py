@@ -21,7 +21,7 @@ def load_data(selected_split):
     if filter_option == "composer" and selected_composer:
         dataset = dataset.filter(lambda example: example["composer"] == selected_composer)
     elif filter_option == "title" and search_by_title:
-        dataset = dataset.filter(lambda example: str(search_by_title) in example["title"])
+        dataset = dataset.filter(lambda example: str(search_by_title).lower() in example["title"].lower())
 
     return dataset
 
